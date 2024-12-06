@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload File</title>
+</head>
+<body>
+    <h1>Upload File</h1>
+    <form id="uploadForm">
+        <input type="file" id="fileInput" name="file" required />
+        <button type="submit">Upload</button>
+    </form>
+
+    <p id="response"></p>
+
+    <script>
+        // JavaScript to handle the form submission
+        const uploadForm = document.getElementById('uploadForm');
+        const fileInput = document.getElementById('fileInput');
+        const responseElement = document.getElementById('response');
+
+        uploadForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Get the file from the input
+            const file = fileInput.files[0];
+            if (!file) {
+                responseElement.textContent = "Please select a file.";
+                return;
+            }
+
+            // Create FormData object
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                // Send the file to the backend
+                const response = await fetch('http://127.0.0.1:5000/anomalies', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    responseElement.textContent = `File uploaded successfully. Response: ${JSON.stringify(data)}`;
+                } else {
+                    const errorText = await response.text();
+                    responseElement.textContent = `Error: ${errorText}`;
+                }
+            } catch (error) {
+                responseElement.textContent = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
